@@ -48,6 +48,7 @@ app.use(middleware.iff([
 
 ...
 ```
+In this example, only a `[POST|DELETE|PUT|PATCH] /tasks/:id` request will cause the middleware to be executed.
 ### Chaining
 You can optionally chain iff -> unless or vice-versa:
 ```js
@@ -91,7 +92,7 @@ middleware.iff([
   '/login', // if string is passed, the GET method is inferred
   {
     methods: ['DELETE', 'POST', '...'],
-    url: '/task/:id/*'
+    url: '/tasks/:id/*'
   }
 ])
 ```
@@ -101,7 +102,7 @@ middleware.unless({ endpoints: [
   '/login', // if string is passed, the GET method is inferred
   {
     methods: ['DELETE', 'POST', '...'],
-    url: '/task/:id/*'
+    url: '/tasks/:id/*'
   }
 ]})
 ```
