@@ -13,8 +13,12 @@ module.exports = function (routerOpts = {}, routerFactory) {
     const opts = typeof options === 'function' ? { custom: options } : (Array.isArray(options) ? { endpoints: options } : options)
     if (opts.endpoints && opts.endpoints.length) {
       // setup matching router
-      opts.endpoints.map(endpoint => typeof endpoint === 'string' ? { methods: ['GET'], url: endpoint } : endpoint).forEach(({ methods, url }) => {
-        router.on(methods, url, op)
+      opts.endpoints.map(endpoint => typeof endpoint === 'string' ? { methods: ['GET'], url: endpoint } : endpoint).forEach(({ methods, url, version }) => {
+        if (version) {
+          router.on(methods, url, { version }, op)
+        } else {
+          router.on(methods, url, op)
+        }
       })
     }
 

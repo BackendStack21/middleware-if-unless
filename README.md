@@ -41,8 +41,8 @@ Execute middleware only if routing restrictions matches:
 const app = require('express')()
 app.use(middleware.iff([
   {
-      methods: ['POST', 'DELETE', 'PUT', 'PATCH'],
-      url: '/tasks/:id'
+    methods: ['POST', 'DELETE', 'PUT', 'PATCH'],
+    url: '/tasks/:id'
   }
 ]))
 
@@ -79,6 +79,10 @@ const iu = require('middleware-if-unless')(
   function(opts){}
 )
 ```
+### Known compatible routers:
+- https://www.npmjs.com/package/find-my-way
+- https://www.npmjs.com/package/anumargak
+
 ## iff / unless
 Both methods share the same configuration format:
 
@@ -106,3 +110,19 @@ middleware.unless({ endpoints: [
   }
 ]})
 ```
+#### Supporting Accept-Version header
+Optionally, you can also restrict your middleware execution to specific versions using the `Accept-Version` header:
+> The `version` value should follow the [semver](https://semver.org/) specification.
+```js
+middleware.iff({ endpoints: [
+  {
+    methods: ['GET'],
+    url: '/tasks/:id',
+    version: '2.0.0'
+  }
+]})
+```
+In the example, a `GET /tasks/:id` request will only execute the middleware if the `Accept-Version` header matches `2.0.0`. For example:
+- Accept-Version=2.0.0
+- Accept-Version=2.x
+- Accept-Version=2.0.x
