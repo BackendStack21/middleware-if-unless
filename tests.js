@@ -24,13 +24,23 @@ describe('middleware-if-unless', () => {
       .iff(req => req.url.startsWith('/pets'))
       .iff([
         '/pets/*',
-        '/pets/:id'
-      ]).unless([
+        '/pets/:id',
+        {
+          methods: ['GET'],
+          url: '/pets/:id',
+          version: '3.0.0'
+        }
+      ])
+      .unless([
         '/pets/groups/list',
         {
           url: '/pets/:id', methods: ['DELETE']
         }
-      ]).unless(req => req.url.endsWith('.js'))
+      ])
+      .unless(req => req.url.endsWith('.js'))
+      .unless([{
+        url: '/pets/:id', methods: ['GET'], version: '2.x'
+      }])
     )
 
     server = await service.start(~~process.env.PORT)
@@ -76,6 +86,24 @@ describe('middleware-if-unless', () => {
         .get('/script.js')
         .then((response) => {
           expect(response.text).to.equal('')
+        })
+    })
+
+    it('should skip middleware on GET /pets/:id using accept-version 2.x', async () => {
+      await request(server)
+        .get('/pets/0')
+        .set('accept-version', '2.0.1')
+        .then((response) => {
+          expect(response.text).to.equal('')
+        })
+    })
+
+    it('should hit middleware on GET /pets/:id using accept-version 3.x', async () => {
+      await request(server)
+        .get('/pets/0')
+        .set('accept-version', '3.x')
+        .then((response) => {
+          expect(response.text).to.equal('hit')
         })
     })
   })
