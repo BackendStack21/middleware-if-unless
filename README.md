@@ -126,3 +126,19 @@ In the example, a `GET /tasks/:id` request will only execute the middleware if t
 - Accept-Version=2.0.0
 - Accept-Version=2.x
 - Accept-Version=2.0.x
+
+#### Updatings requests params object
+Optionally, you can override the `req.params` object with the parameters of the matching route defined on your configs:
+```js
+middleware.iff({ endpoints: [
+  {
+    methods: ['GET'],
+    url: '/tasks/:id',
+    version: '2.0.0',
+    updateParams: true  // enabling this config will result in req.params = {id: ...}
+  }
+]})
+```
+> This feature can be really useful for business specific middlewares using the `iff` matching type.
+
+```

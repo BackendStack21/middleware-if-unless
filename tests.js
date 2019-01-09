@@ -5,6 +5,7 @@ const iffUnless = require('./index')()
 
 const middleware = function (req, res, next) {
   res.body = 'hit'
+  res.setHeader('id', req.params ? String(req.params.id) : '')
 
   return next()
 }
@@ -28,7 +29,8 @@ describe('middleware-if-unless', () => {
         {
           methods: ['GET'],
           url: '/pets/:id',
-          version: '3.0.0'
+          version: '3.0.0',
+          updateParams: true
         }
       ])
       .unless([
@@ -104,6 +106,15 @@ describe('middleware-if-unless', () => {
         .set('accept-version', '3.x')
         .then((response) => {
           expect(response.text).to.equal('hit')
+        })
+    })
+
+    it('should get middleware route params on GET /pets/:id using accept-version 3.x', async () => {
+      await request(server)
+        .get('/pets/0')
+        .set('accept-version', '3.x')
+        .then((response) => {
+          expect(response.headers.id).to.equal('0')
         })
     })
   })

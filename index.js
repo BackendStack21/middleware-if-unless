@@ -1,4 +1,10 @@
-const op = () => true
+const op = updateParams => (req, res, params) => {
+  if (updateParams) {
+    req.params = params
+  }
+
+  return true
+}
 
 module.exports = function (routerOpts = {}, routerFactory) {
   routerOpts.defaultRoute = () => false
@@ -13,13 +19,15 @@ module.exports = function (routerOpts = {}, routerFactory) {
     const opts = typeof options === 'function' ? { custom: options } : (Array.isArray(options) ? { endpoints: options } : options)
     if (opts.endpoints && opts.endpoints.length) {
       // setup matching router
-      opts.endpoints.map(endpoint => typeof endpoint === 'string' ? { methods: ['GET'], url: endpoint } : endpoint).forEach(({ methods, url, version }) => {
-        if (version) {
-          router.on(methods, url, { version }, op)
-        } else {
-          router.on(methods, url, op)
-        }
-      })
+      opts.endpoints
+        .map(endpoint => typeof endpoint === 'string' ? { methods: ['GET'], url: endpoint } : endpoint)
+        .forEach(({ methods, url, version, updateParams = false }) => {
+          if (version) {
+            router.on(methods, url, { version }, op(updateParams))
+          } else {
+            router.on(methods, url, op(updateParams))
+          }
+        })
     }
 
     const result = function (req, res, next) {
