@@ -140,5 +140,3 @@ middleware.iff({ endpoints: [
 ]})
 ```
 > This feature can be really useful for business specific middlewares using the `iff` matching type.
-
-```
