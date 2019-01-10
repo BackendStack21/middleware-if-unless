@@ -18,6 +18,9 @@
   "files": [
     "README.md"
   ],
+  "engines": {
+    "node": ">=8"
+  },
   "author": "Rolando Santamaria Maso <kyberneees@gmail.com>",
   "license": "MIT",
   "bugs": {
