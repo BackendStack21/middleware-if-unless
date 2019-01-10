@@ -1,14 +1,16 @@
-const op = updateParams => (req, res, params) => {
-  if (updateParams) {
-    req.params = params
-  }
+const handlers = {
+  match: updateParams => (req, res, params) => {
+    if (updateParams) {
+      req.params = params
+    }
 
-  return true
+    return true
+  },
+  default: () => false
 }
 
-module.exports = function (routerOpts = {}, routerFactory) {
-  routerOpts.defaultRoute = () => false
-  routerFactory = routerFactory || require('find-my-way')
+module.exports = function (routerOpts = {}, routerFactory = require('find-my-way')) {
+  routerOpts.defaultRoute = handlers.default
 
   function exec (options, isIff = true) {
     const middleware = this
@@ -20,12 +22,12 @@ module.exports = function (routerOpts = {}, routerFactory) {
     if (opts.endpoints && opts.endpoints.length) {
       // setup matching router
       opts.endpoints
-        .map(endpoint => typeof endpoint === 'string' ? { methods: ['GET'], url: endpoint } : endpoint)
-        .forEach(({ methods, url, version, updateParams = false }) => {
+        .map(endpoint => typeof endpoint === 'string' ? { url: endpoint } : endpoint)
+        .forEach(({ methods = ['GET'], url, version, updateParams = false }) => {
           if (version) {
-            router.on(methods, url, { version }, op(updateParams))
+            router.on(methods, url, { version }, handlers.match(updateParams))
           } else {
-            router.on(methods, url, op(updateParams))
+            router.on(methods, url, handlers.match(updateParams))
           }
         })
     }
