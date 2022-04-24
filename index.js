@@ -25,7 +25,7 @@ module.exports = function (routerOpts = {}, routerFactory = require('find-my-way
         .map(endpoint => typeof endpoint === 'string' ? { url: endpoint } : endpoint)
         .forEach(({ methods = ['GET'], url, version, updateParams = false }) => {
           if (version) {
-            router.on(methods, url, { version }, handlers.match(updateParams))
+            router.on(methods, url, { constraints: { version } }, handlers.match(updateParams))
           } else {
             router.on(methods, url, handlers.match(updateParams))
           }

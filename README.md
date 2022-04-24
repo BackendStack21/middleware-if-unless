@@ -1,9 +1,10 @@
 # middleware-if-unless
 Invokes connect-like middleware if / unless routing criteria matches. Inspired on [express-unless](https://www.npmjs.com/package/express-unless) module.  
+> 
 
 ## Main features
 - Advanced routes matching capabilities. Uses [find-my-way](https://www.npmjs.com/package/find-my-way) or any compatible router to match the routes. 
-- `iff`: execute middleware only if the routes matches. Ideal use case: API gateways (see: [k-fastify-gateway](https://www.npmjs.com/package/k-fastify-gateway))
+- `iff`: execute middleware only if the routes matches. Ideal use case: API gateways (see: [fast-gateway](https://www.npmjs.com/package/fast-gateway))
 - `unless`: execute middleware always unless the routes matches.
 - Arbitraty chaining of iff -> unless of vice-versa.
 - Low overhead, crazy fast implementation. 
