@@ -1,4 +1,12 @@
 # Introduction
+[![NPM version](https://badgen.net/npm/v/middleware-if-unless)](https://www.npmjs.com/package/middleware-if-unless)
+[![NPM Total Downloads](https://badgen.net/npm/dt/middleware-if-unless)](https://www.npmjs.com/package/middleware-if-unless)
+[![License](https://badgen.net/npm/license/middleware-if-unless)](https://www.npmjs.com/package/middleware-if-unless)
+[![TypeScript support](https://badgen.net/npm/types/middleware-if-unless)](https://www.npmjs.com/package/middleware-if-unless)
+[![Github stars](https://img.shields.io/github/stars/BackendStack21/middleware-if-unless?style=flat)](https://github.com/BackendStack21/middleware-if-unless)
+
+<img src="logo.svg" width="400">  
+
 Invokes connect-like middleware if / unless routing criteria match. 
 > Inspired by the [express-unless](https://www.npmjs.com/package/express-unless) module.  
 
