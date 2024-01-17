@@ -1,6 +1,8 @@
 # Introduction
+<img src="logo.svg" width="400">  
+
 Invokes connect-like middleware if / unless routing criteria match. 
-> Inspired by the [express-unless](https://www.npmjs.com/package/express-unless) module.  
+> Inspired by the [express-unless](https://www.npmjs.com/package/express-unless) module. But a lot faster ;)
 
 ## Main features
 - Advanced routes matching capabilities. Uses [find-my-way](https://www.npmjs.com/package/find-my-way) or any compatible router to match the routes. 

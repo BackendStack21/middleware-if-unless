@@ -5,10 +5,10 @@
 [![TypeScript support](https://badgen.net/npm/types/middleware-if-unless)](https://www.npmjs.com/package/middleware-if-unless)
 [![Github stars](https://img.shields.io/github/stars/BackendStack21/middleware-if-unless?style=flat)](https://github.com/BackendStack21/middleware-if-unless)
 
-<img src="logo.svg" width="400">  
+<img src="docs/logo.svg" width="400">  
 
 Invokes connect-like middleware if / unless routing criteria match. 
-> Inspired by the [express-unless](https://www.npmjs.com/package/express-unless) module.  
+> Inspired by the [express-unless](https://www.npmjs.com/package/express-unless) module. But a lot faster ;)
 
 ## Main features
 - Advanced routes matching capabilities. Uses [find-my-way](https://www.npmjs.com/package/find-my-way) or any compatible router to match the routes. 
