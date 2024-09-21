@@ -36,6 +36,6 @@
     "supertest": "^6.3.3"
   },
   "dependencies": {
-    "find-my-way": "^7.4.0"
+    "find-my-way": "^9.0.1"
   }
 }
