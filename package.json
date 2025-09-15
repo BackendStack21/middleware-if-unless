@@ -1,6 +1,6 @@
 {
   "name": "middleware-if-unless",
-  "version": "1.4.1",
+  "version": "1.5.1",
   "description": "Invokes connect-like middleware if / unless routing criteria matches. Inspired on express-unless module.",
   "main": "index.js",
   "scripts": {
