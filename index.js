@@ -1,65 +1,95 @@
-const handlers = {
-  match: updateParams => (req, res, params) => {
-    if (updateParams) {
-      req.params = params
-    }
+// Optimized handlers with minimal allocations
+const createMatchHandler = (updateParams) =>
+  updateParams
+    ? (req, res, params) => {
+        req.params = params
+        return true
+      }
+    : () => true
 
-    return true
-  },
-  default: () => false
+const defaultHandler = () => false
+
+// Router cache for reusing router instances
+const routerCache = new WeakMap()
+
+function normalizeEndpoint (endpoint) {
+  if (typeof endpoint === 'string') {
+    return { url: endpoint, methods: ['GET'], updateParams: false }
+  }
+  return {
+    methods: endpoint.methods || ['GET'],
+    url: endpoint.url,
+    version: endpoint.version,
+    updateParams: endpoint.updateParams || false
+  }
 }
 
 module.exports = function (routerOpts = {}, routerFactory = require('find-my-way')) {
-  routerOpts.defaultRoute = handlers.default
-
   function exec (options, isIff = true) {
     const middleware = this
+    let router = null
+    let customFn = null
 
-    // independent router instance per config
-    const router = routerFactory(routerOpts)
+    // Process options efficiently
+    if (typeof options === 'function') {
+      customFn = options
+    } else {
+      const endpoints = Array.isArray(options) ? options : options?.endpoints
 
-    const opts = typeof options === 'function' ? { custom: options } : (Array.isArray(options) ? { endpoints: options } : options)
-    if (opts.endpoints && opts.endpoints.length) {
-      // setup matching router
-      opts.endpoints
-        .map(endpoint => typeof endpoint === 'string' ? { url: endpoint } : endpoint)
-        .forEach(({ methods = ['GET'], url, version, updateParams = false }) => {
-          if (version) {
-            router.on(methods, url, { constraints: { version } }, handlers.match(updateParams))
-          } else {
-            router.on(methods, url, handlers.match(updateParams))
-          }
-        })
-    }
-
-    const result = function (req, res, next) {
-      // supporting custom matching function
-      if (opts.custom) {
-        if (opts.custom(req)) {
-          if (isIff) {
-            return middleware(req, res, next)
-          }
-        } else if (!isIff) {
-          return middleware(req, res, next)
+      if (endpoints?.length) {
+        // Try to get cached router first
+        let cache = routerCache.get(routerOpts)
+        if (!cache) {
+          cache = new Map()
+          routerCache.set(routerOpts, cache)
         }
 
-        // leave here and do not process opts.endpoints
-        return next()
+        const cacheKey = JSON.stringify(endpoints)
+        router = cache.get(cacheKey)
+
+        if (!router) {
+          router = routerFactory({ ...routerOpts, defaultRoute: defaultHandler })
+
+          // Normalize and register routes
+          const normalized = endpoints.map(normalizeEndpoint)
+          for (const { methods, url, version, updateParams } of normalized) {
+            const handler = createMatchHandler(updateParams)
+
+            if (version) {
+              router.on(methods, url, { constraints: { version } }, handler)
+            } else {
+              router.on(methods, url, handler)
+            }
+          }
+
+          cache.set(cacheKey, router)
+        }
       }
 
-      // matching endpoints and moving forward
-      if (router.lookup(req, res)) {
-        if (isIff) {
-          return middleware(req, res, next)
-        }
-      } else if (!isIff) {
+      if (options?.custom) {
+        customFn = options.custom
+      }
+    }
+
+    // Optimized execution function
+    const result = function (req, res, next) {
+      let shouldExecute = false
+
+      if (customFn) {
+        shouldExecute = customFn(req)
+      } else if (router) {
+        shouldExecute = router.lookup(req, res)
+      }
+
+      // Simplified logic: execute middleware if conditions match
+      if ((isIff && shouldExecute) || (!isIff && !shouldExecute)) {
         return middleware(req, res, next)
       }
 
       return next()
     }
 
-    // allowing chaining
+    // Allow chaining
     result.iff = iff
     result.unless = unless
 
