@@ -16,7 +16,7 @@
     "unless"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=22.0.0"
   },
   "files": [
     "index.js",
