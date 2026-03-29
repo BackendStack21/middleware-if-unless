@@ -19,17 +19,17 @@ const normalizedCache = new WeakMap()
 // Pre-computes hash to avoid repeated calculations
 function fastHashEndpoints (endpoints) {
   if (!Array.isArray(endpoints) || endpoints.length === 0) return ''
-  
+
   let hash = endpoints.length.toString()
   const first = endpoints[0]
   const last = endpoints[endpoints.length - 1]
-  
+
   // Hash first endpoint
   hash += '|' + (typeof first === 'string' ? first : (first.url || '') + (first.methods ? first.methods.join(',') : ''))
-  
+
   // Hash last endpoint (catches most variations)
   hash += '|' + (typeof last === 'string' ? last : (last.url || '') + (last.methods ? last.methods.join(',') : ''))
-  
+
   return hash
 }
 
@@ -39,24 +39,24 @@ function normalizeEndpoint (endpoint) {
   if (typeof endpoint === 'string') {
     return { url: endpoint, methods: ['GET'], updateParams: false }
   }
-  
+
   // Check if we've already normalized this endpoint object
   if (typeof endpoint === 'object' && endpoint !== null) {
-    let cached = normalizedCache.get(endpoint)
+    const cached = normalizedCache.get(endpoint)
     if (cached) return cached
-    
+
     const normalized = {
       methods: endpoint.methods || ['GET'],
       url: endpoint.url,
       version: endpoint.version,
       updateParams: endpoint.updateParams || false
     }
-    
+
     // Cache the normalized form for future use
     normalizedCache.set(endpoint, normalized)
     return normalized
   }
-  
+
   return {
     methods: endpoint.methods || ['GET'],
     url: endpoint.url,
