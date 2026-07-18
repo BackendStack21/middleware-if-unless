@@ -119,6 +119,31 @@ describe('middleware-if-unless', () => {
     })
   })
 
+  describe('router cache', () => {
+    it('should not reuse a cached router for arrays sharing length, first and last endpoints', () => {
+      const factory = require('../index')()
+      let hits = 0
+      const auth = (req, res, next) => {
+        hits += 1
+        return next()
+      }
+      const req = (url) => ({ url, method: 'GET', headers: {} })
+
+      // both arrays map to the same legacy cache key "3|/health|/status"
+      factory(auth).unless(['/health', '/admin', '/status'])
+      const guarded = factory(auth).unless(['/health', '/public', '/status'])
+
+      // /admin is not excluded by the second array: middleware must run
+      guarded(req('/admin'), {}, () => {})
+      expect(hits).to.equal(1)
+
+      // /public is excluded by the second array: middleware must be skipped
+      hits = 0
+      guarded(req('/public'), {}, () => {})
+      expect(hits).to.equal(0)
+    })
+  })
+
   it('should successfully terminate the service', async () => {
     await service.close()
   })

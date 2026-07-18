@@ -14,25 +14,6 @@ const routerCache = new WeakMap()
 // Maps endpoint objects to their normalized form
 const normalizedCache = new WeakMap()
 
-// PERF: Fast hash function for cache keys (replaces expensive JSON.stringify)
-// Uses array length and first/last endpoint properties for O(1) hashing
-// Pre-computes hash to avoid repeated calculations
-function fastHashEndpoints (endpoints) {
-  if (!Array.isArray(endpoints) || endpoints.length === 0) return ''
-
-  let hash = endpoints.length.toString()
-  const first = endpoints[0]
-  const last = endpoints[endpoints.length - 1]
-
-  // Hash first endpoint
-  hash += '|' + (typeof first === 'string' ? first : (first.url || '') + (first.methods ? first.methods.join(',') : ''))
-
-  // Hash last endpoint (catches most variations)
-  hash += '|' + (typeof last === 'string' ? last : (last.url || '') + (last.methods ? last.methods.join(',') : ''))
-
-  return hash
-}
-
 // PERF: Optimized endpoint normalization with caching
 // Reuses normalized endpoints to avoid repeated object creation
 function normalizeEndpoint (endpoint) {
@@ -80,15 +61,16 @@ module.exports = function (routerOpts = {}, routerFactory = require('find-my-way
       const endpoints = Array.isArray(options) ? options : options.endpoints
 
       if (endpoints && endpoints.length > 0) {
-        // PERF: Try to get cached router first using fast hash
+        // PERF: Try to get cached router first
         let cache = routerCache.get(routerOpts)
         if (!cache) {
           cache = new Map()
           routerCache.set(routerOpts, cache)
         }
 
-        // PERF: Use fast hash instead of JSON.stringify (15-20% faster)
-        const cacheKey = fastHashEndpoints(endpoints)
+        // Cache key must serialize the full endpoint list: partial keys
+        // collide and silently reuse a router built for different routes
+        const cacheKey = JSON.stringify(endpoints)
         router = cache.get(cacheKey)
 
         if (!router) {
